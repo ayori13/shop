@@ -1,0 +1,4 @@
+echo "node_modules/
+*.log
+.DS_Store
+.env" > .gitignore
