@@ -1,0 +1,198 @@
+openapi: 3.0.0
+info:
+  title: Админ-панель интернет-магазина API
+  description: API для управления товарами интернет-магазина
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Локальный сервер разработки
+
+paths:
+  /products:
+    get:
+      summary: Получить список всех товаров
+      responses:
+        '200':
+          description: Список товаров успешно получен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+        '500':
+          description: Внутренняя ошибка сервера
+          
+    post:
+      summary: Добавить новый товар или несколько товаров
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/NewProduct'
+                - type: array
+                  items:
+                    $ref: '#/components/schemas/NewProduct'
+      responses:
+        '201':
+          description: Товар(ы) успешно добавлен(ы)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Product'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Внутренняя ошибка сервера
+          
+  /products/{id}:
+    get:
+      summary: Получить информацию о товаре по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID товара
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Товар успешно найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Товар не найден
+        '500':
+          description: Внутренняя ошибка сервера
+          
+    put:
+      summary: Обновить информацию о товаре по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID товара
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProduct'
+      responses:
+        '200':
+          description: Товар успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Товар не найден
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Внутренняя ошибка сервера
+          
+    delete:
+      summary: Удалить товар по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID товара
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Товар успешно удален
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Товар не найден
+        '500':
+          description: Внутренняя ошибка сервера
+          
+  /categories:
+    get:
+      summary: Получить список всех категорий
+      responses:
+        '200':
+          description: Список категорий успешно получен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      type: string
+        '500':
+          description: Внутренняя ошибка сервера
+
+components:
+  schemas:
+    NewProduct:
+      type: object
+      required:
+        - name
+        - price
+        - description
+        - categories
+      properties:
+        name:
+          type: string
+          description: Название товара
+        price:
+          type: number
+          description: Цена товара
+        description:
+          type: string
+          description: Описание товара
+        categories:
+          type: array
+          items:
+            type: string
+          description: Категории товара
+      
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - description
+        - categories
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор товара
+        name:
+          type: string
+          description: Название товара
+        price:
+          type: number
+          description: Цена товара
+        description:
+          type: string
+          description: Описание товара
+        categories:
+          type: array
+          items:
+            type: string
+          description: Категории товара
